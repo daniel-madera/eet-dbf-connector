@@ -76,5 +76,14 @@ namespace EetConnector.Properties {
                 return ((string)(this["REQ_URL"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("output.log")]
+        public string LOG_PATH {
+            get {
+                return ((string)(this["LOG_PATH"]));
+            }
+        }
     }
 }

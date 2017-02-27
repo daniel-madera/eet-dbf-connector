@@ -20,5 +20,8 @@
     <Setting Name="REQ_URL" Type="System.String" Scope="Application">
       <Value Profile="(Default)">https://pg.eet.cz:443/eet/services/EETServiceSOAP/v3</Value>
     </Setting>
+    <Setting Name="LOG_PATH" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">output.log</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

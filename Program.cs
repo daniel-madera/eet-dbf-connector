@@ -18,22 +18,17 @@ namespace EetConnector
         {
             if (args.Length == 2 && args[0].Equals("encrypt_password")) 
             {                
-                Console.WriteLine(String.Format("Nové heslo: {0}", PasswordCipher.Encrypt(args[1])));
-                Console.WriteLine("Přepište hodnotu položky CRT_PASS v souboru .config na nové heslo a spusťte program znovu.");
-                Console.WriteLine("Pokračujte libovolnou klávesou.");
+                Logger.Log(String.Format("Nové heslo: {0}", PasswordCipher.Encrypt(args[1])), Logger.Out.CONSOLE);
+                Logger.Log("Přepište hodnotu položky CRT_PASS v souboru .config na nové heslo a spusťte program znovu.", Logger.Out.CONSOLE);
+                Logger.Log("Pokračujte libovolnou klávesou...", Logger.Out.CONSOLE);
                 Console.ReadKey();
                 return 0;
             }
 
             String bkp, pkp = "", fik, requestBody, response, datPrij;
-            TextWriter writer = null;
 
             try
             {
-                // log console output
-                writer = File.CreateText("log.txt");
-                Console.SetOut(writer);
-
                 String dbf = Settings.Default.DBF_PATH;
                 String dic = Settings.Default.DIC;
                 String idProvoz = Settings.Default.ID_PROVOZ;
@@ -45,6 +40,7 @@ namespace EetConnector
 
                 Dictionary<String, String> data = dbfConnector.ReadData();
 
+                // generate XML request
                 EetRegisterRequest request = EetRegisterRequest.builder()
                    .dic_popl(dic)
                    .id_provoz(idProvoz)
@@ -72,27 +68,29 @@ namespace EetConnector
                 if (bkp == null) throw new ApplicationException("Špatně vypočtená BKP hodnota.");
 
                 requestBody = request.generateSoapRequest();
-                if (requestBody == null) throw new ApplicationException("Nepodařilo se spojit se serverem.");
-                // throw new ApplicationException("Nepodařilo se spojit se serverem.");
+                if (requestBody == null) throw new ApplicationException("Nepodařilo se vygenerovat SOAP zprávu.");
 
                 response = request.sendRequest(requestBody, reqUrl);
+                if (response == null) throw new ApplicationException("Nepodařilo se spojit se serverem.");
 
+                // search for FIK
                 String search = "<eet:Potvrzeni fik=\"";
                 int indexOf = response.IndexOf(search);
                 if (indexOf < 0) throw new ApplicationException("FIK nebyl v odpovědi nalezen.");
                 fik = response.Substring(indexOf + search.Length, 39);
 
+                // search fir DAT_PRIJ
                 search = " dat_prij=\"";
                 indexOf = response.IndexOf(search);
-                datPrij = DateTime.Parse(response.Substring(indexOf + search.Length, 25)).ToString("yyyy-MM-dd HH:mm:ss");
+                datPrij = DateTime.Parse(response.Substring(indexOf + search.Length, 25)).ToString("yyyy-MM-dd' 'HH:mm:ss");
 
                 dbfConnector.Write(fik, bkp, datPrij);
-                Console.WriteLine("FIK, BKP a DAT_PRIJ byly úspěšně zapsány.");
+                Logger.Log("FIK, BKP a DAT_PRIJ byly úspěšně získány.", Logger.Out.FILE);
                 return 0;
             }
             catch (Exception e)
             {
-                Console.WriteLine("Chyba: " + e.Message);
+                Logger.Log(e.Message, Logger.Out.FILE, Logger.Type.ERROR);
                 if (pkp != null && !pkp.Equals(""))
                 {
                     try
@@ -100,21 +98,84 @@ namespace EetConnector
                         String dbf = Properties.Settings.Default.DBF_PATH;
                         EetDbfConnector dbfConnector = new EetDbfConnector(dbf);
                         dbfConnector.Write(pkp);
-                        Console.WriteLine("PKP bylo úspěšně zapsáno.");
+                        var message = String.Format("PKP bylo úspěšně zapsáno. PKP: {0}", pkp);
+                        Logger.Log(message, Logger.Out.FILE);
                     }
-                    catch (Exception) {}
+                    catch (Exception) 
+                    {
+                        var message = String.Format("Nepodařilo se zapsat PKP. PKP: {0}", pkp);
+                        Logger.Log(message, Logger.Out.FILE, Logger.Type.ERROR);
+                    }
                 }
                 return -1;
             }
-            finally 
+        }
+    }
+
+    public static class Logger {
+        
+        public enum Type 
+        {
+            INFO, SUCCESS, ERROR, WARNING
+        }
+
+        public enum Out 
+        {
+            FILE, CONSOLE, BOTH
+        }
+
+        public static void Log(String message, Out output = Out.FILE, Type type = Type.INFO)
+        {
+            String timestamp = DateTime.Now.ToString("yyyy-MM-dd' 'HH:mm:ss");
+            String logEntry = String.Format("[{0}][{1}] {2}", timestamp, type.ToString(), message);
+            String consoleEntry = String.Format("{0}", message);
+
+            if(output == Out.FILE || output == Out.BOTH) {
+                logFile(logEntry);
+            }
+
+            if (output == Out.CONSOLE || output == Out.BOTH) 
             {
-                try
+                logConsole(consoleEntry);
+            }
+        }
+
+        private static void logFile(String entry) 
+        {
+            try
+            {
+                var logFilePath = Settings.Default.LOG_PATH;
+
+                if (!File.Exists(logFilePath)) 
                 {
+                    File.Create(logFilePath).Close();
+                }
+
+                var length = new FileInfo(logFilePath).Length;
+
+                if (length >= 20000)
+                {
+                    var lines = File.ReadAllLines(logFilePath);
+                    File.WriteAllLines(logFilePath, lines.Skip(lines.Length / 2).ToArray());
+                }
+
+                using (StreamWriter writer = File.AppendText(logFilePath))
+                {
+                    writer.WriteLine(entry);
                     writer.Flush();
                     writer.Close();
                 }
-                catch (Exception) { }
             }
+            catch (Exception e) 
+            {
+                Console.WriteLine("Nepodařilo se zapsat do log souboru '{0}'.", Settings.Default.LOG_PATH);
+                Console.WriteLine("Detail chyby: {0}", e.Message);
+            }
+        }
+
+        private static void logConsole(String entry)
+        {
+            Console.WriteLine(entry);
         }
     }
 }
