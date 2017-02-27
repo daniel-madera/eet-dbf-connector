@@ -10,5 +10,7 @@ Pozn. Pozor na název souboru DBF. Cesta nesmí obsahovat speciální znaky jako pom
 ## Vygenerování zašifrovaného hesla
 C:\Users\User>cd C:\EetConvDir\
 C:\EetConvDir\>eet_conv.exe encrypt_password heslohovnokleslo
+
 Nové heslo: /6Bj7e4BsxdXT35lH7iBi0g9uzSbeT67gqxhSx15yTs=
+
 Pøepište hodnotu poloky CRT_PASS v souboru eet_conv.exe.config na nové heslo a spuste program znovu bez parametrù.
