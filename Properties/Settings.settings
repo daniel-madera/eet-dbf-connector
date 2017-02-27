@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="DBF_PATH" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">C:\PathToDBF\EET.DBF</Value>
+      <Value Profile="(Default)">dbf\EET.DBF</Value>
     </Setting>
     <Setting Name="DIC" Type="System.String" Scope="Application">
       <Value Profile="(Default)">CZ1212121218</Value>

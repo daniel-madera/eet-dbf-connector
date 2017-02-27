@@ -25,7 +25,7 @@ namespace EetConnector.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\PathToDBF\\EET.DBF")]
+        [global::System.Configuration.DefaultSettingValueAttribute("dbf\\EET.DBF")]
         public string DBF_PATH {
             get {
                 return ((string)(this["DBF_PATH"]));
