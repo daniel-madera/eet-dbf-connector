@@ -39,20 +39,14 @@ namespace EetConnector
                 String idProvoz = Settings.Default.ID_PROVOZ;
                 String certPath = Settings.Default.CRT_PATH;
                 String certPassword = PasswordCipher.Decrypt(Settings.Default.CRT_PASS);
+                String reqUrl = Settings.Default.REQ_URL;
 
                 EetDbfConnector dbfConnector = new EetDbfConnector(dbf);
-
-                Mod prod = new Mod("https://prod.eet.cz:443/eet/services/EETServiceSOAP/v3", dic, certPath, certPassword);
-                Mod pg = new Mod("https://pg.eet.cz:443/eet/services/EETServiceSOAP/v3", "CZ1212121218", @"certificates\pg_cert.p12", "eet");
-
-                Boolean isPgMode = Settings.Default.EET_TEST;
-
-                Mod mod = isPgMode ? pg : prod;
 
                 Dictionary<String, String> data = dbfConnector.ReadData();
 
                 EetRegisterRequest request = EetRegisterRequest.builder()
-                   .dic_popl(mod.dic)
+                   .dic_popl(dic)
                    .id_provoz(idProvoz)
                    .id_pokl(data["id_pokl"])
                    .porad_cis(data["porad_cis"])
@@ -67,8 +61,8 @@ namespace EetConnector
                    .celk_trzba(data["celk_trzba"])
                    .rezim(Rezim.ZJEDNODUSENY)
                    .prvni_zaslani(data["pkp1"].Equals("") && data["pkp2"].Equals("") ? PrvniZaslani.PRVNI : PrvniZaslani.OPAKOVANE)
-                   .pkcs12(mod.certPath)
-                   .pkcs12password(mod.certPassword)
+                   .pkcs12(certPath)
+                   .pkcs12password(certPassword)
                    .build();
 
                 pkp = request.formatPkp();
@@ -81,7 +75,7 @@ namespace EetConnector
                 if (requestBody == null) throw new ApplicationException("Nepodařilo se spojit se serverem.");
                 // throw new ApplicationException("Nepodařilo se spojit se serverem.");
 
-                response = request.sendRequest(requestBody, mod.requestUrl);
+                response = request.sendRequest(requestBody, reqUrl);
 
                 String search = "<eet:Potvrzeni fik=\"";
                 int indexOf = response.IndexOf(search);
@@ -121,22 +115,6 @@ namespace EetConnector
                 }
                 catch (Exception) { }
             }
-        }
-    }
-
-    public struct Mod
-    {
-        public String requestUrl;
-        public String dic;
-        public String certPath;
-        public String certPassword;
-
-        public Mod(String requestUrl, String dic, String certPath, String certPassword)
-        {
-            this.requestUrl = requestUrl;
-            this.dic = dic;
-            this.certPath = certPath;
-            this.certPassword = certPassword;
         }
     }
 }

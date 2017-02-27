@@ -25,7 +25,7 @@ namespace EetConnector.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("dbf\\EET.DBF")]
+        [global::System.Configuration.DefaultSettingValueAttribute("dbf\\eet_test.dbf")]
         public string DBF_PATH {
             get {
                 return ((string)(this["DBF_PATH"]));
@@ -70,10 +70,10 @@ namespace EetConnector.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool EET_TEST {
+        [global::System.Configuration.DefaultSettingValueAttribute("https://pg.eet.cz:443/eet/services/EETServiceSOAP/v3")]
+        public string REQ_URL {
             get {
-                return ((bool)(this["EET_TEST"]));
+                return ((string)(this["REQ_URL"]));
             }
         }
     }

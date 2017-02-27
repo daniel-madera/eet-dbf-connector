@@ -130,7 +130,7 @@
     <EmbeddedResource Include="certificates\pg_cert.p12">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Include="dbf\eet.dbf">
+    <None Include="dbf\eet_test.dbf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Properties\app.manifest" />
