@@ -4,6 +4,7 @@ Konektor pro zaslání EET a získání FIK na základì hodnot z DBF souboru.
 ## Zmìna konfigurace
 * Nastavit správné hodnoty v souboru eet_conv.exe.config.
 * Produkèní URL pro EET požadavek je https://prod.eet.cz:443/eet/services/EETServiceSOAP/v3.
+
 Pozn. Pozor na název souboru DBF. Cesta nesmí obsahovat speciální znaky jako pomèka, mezera apod.
 
 ## Vygenerování zašifrovaného hesla
