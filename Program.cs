@@ -55,7 +55,7 @@ namespace EetConnector
                    .zakl_dan3(data["zakl_dan3"])
                    .zakl_nepodl_dph(data["zakl_nepod"])
                    .celk_trzba(data["celk_trzba"])
-                   .rezim(Rezim.ZJEDNODUSENY)
+                   .rezim(Rezim.STANDARDNI)
                    .prvni_zaslani(data["pkp1"].Equals("") && data["pkp2"].Equals("") ? PrvniZaslani.PRVNI : PrvniZaslani.OPAKOVANE)
                    .pkcs12(certPath)
                    .pkcs12password(certPassword)
